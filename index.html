@@ -1,21 +1,154 @@
-<html>
-  <script src="https://unpkg.com/jsxapi@5.0.3/dist/jsxapi.js"></script>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>WebEngine xAPI Integration</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</head>
+<body>
 
-  <script>
+Loading..
+<script type="text/javascript">
+(function () {
+  //Check if the getXAPI module is available
+  async function main() {
+    if (typeof getXAPI !== 'function') {
+      document.body.innerHTML = '<h1 id="notavailable">XAPI is not available!</h1>';
+      return;
+    }
 
-  jsxapi
-    .connect('ws://10.125.6.69', {
-      username: 'minzhan2',
-      password: '19850328Aa%',
-    })
-    .on('error', console.error)
-    .on('ready', async (xapi) => {
+    //Define led colors based on booking availability
+    const ledColors = {
+           "Free":"green",
+           "BookedUntil": "red",
+           "FreeUntil": "yellow"
+       }
 
-      xapi.Command.Audio.Volume.Set({ Level: 24 });
+    //Define xapi
+    const xapi = await getXAPI();
 
-      const volume = await xapi.status.get('Audio Volume');
-      console.log(`Volume: ${volume}`);
+    //Declare initial values on load
+    const [
+      deviceType,
+      serialNumber,
+      presence,
+      bookings,
+      peopleCount,
+      peopleCapacity,
+      bookingStatus,
+      bookingAvailability,
+      temp
+    ] = await Promise.all([
+      xapi.Status.SystemUnit.ProductId.get(),
+      xapi.Status.SystemUnit.Hardware.Module.SerialNumber.get(),
+      xapi.Status.RoomAnalytics.PeoplePresence.get(),
+      xapi.Command.Bookings.List(),
+      xapi.Status.RoomAnalytics.PeopleCount.Current.get(),
+      xapi.Status.RoomAnalytics.PeopleCount.Capacity.get(),
+      xapi.Status.Bookings.Availability.Status.get(),
+      xapi.Status.Bookings.Availability.TimeStamp.get(),
+      xapi.Status.Peripherals.ConnectedDevice.RoomAnalytics.AmbientTemperature.get()
+    ]);
+
+    //Select current led color
+    const currentLedColor = ledColors[bookingStatus]
+
+    //Function to select new LED colors based on the booking status
+    async function led() {
+        var bookedStatus = await xapi.Status.Bookings.Availability.Status.get();
+        var bookedAvailability = await xapi.Status.Bookings.Availability.TimeStamp.get();
+        document.getElementById('led').style["background-color"] = ledColors[bookedStatus];
+        document.getElementById('aStatus').innerHTML = bookedStatus;
+        document.getElementById('aAvail').innerHTML = bookedAvailability;
+    }
+
+    //Function to book the device for 30 minutes and print the result of the booking on the screen
+    async function book() {
+        result = await xapi.Command.Bookings.Book();
+        rs = document.getElementById('bookingResult');
+        rs.innerHTML = JSON.stringify(result);
+        rs.style['display'] = "block";
+        setTimeout(function(){rs.style['display'] = "none"}, 3000);
+    }
+
+    async function refreshAnalyticsValues() {
+        const [
+          pres,
+          peopleC,
+          tempe
+        ] = await Promise.all([
+          xapi.Status.RoomAnalytics.PeoplePresence.get(),
+          xapi.Status.RoomAnalytics.PeopleCount.Current.get(),
+          xapi.Status.Peripherals.ConnectedDevice.RoomAnalytics.AmbientTemperature.get()
+        ]);
+
+        document.getElementById('ambtemp').innerHTML = tempe;
+        document.getElementById('count').innerHTML = peopleC;
+        document.getElementById('presence').innerHTML = pres;
+        led();
+    }
+
+
+    //Listen for status changes, updating the value for peoplecount when it changes on the codec
+    xapi.Status.RoomAnalytics.on((event) => {
+        refreshAnalyticsValues();
+    });
+    xapi.Status.Bookings.on((event) => {
+        refreshAnalyticsValues();
     });
 
-  </script>
+
+    document.body.innerHTML = `
+<div class="jumbotron text-center" id="led" style="background-color: ${currentLedColor}">
+  <h1>${deviceType}</h1>
+  ${serialNumber}
+</div>
+
+<div class="container">
+      <div class="row">
+        <div class="col-sm-3 mx-auto">
+          <div class="card" align="center">
+            <div class="card-body">
+                <h4 class="card-title">Environment</h4>
+                    <p class="card-text">People count: <b id='count'>${peopleCount}</b></p>
+                    <p class="card-text">Capacity: <b id='relativeHum'>${peopleCapacity}</b></p>
+                    <p class="card-text">People present: <b id='presence'>${presence}</b></p>
+                    <p class="card-text">Temperature: <b id='ambtemp'>${temp}</b></p>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-8 mx-auto">
+            <div class="card">
+            <div class="card-body">
+                <h4 class="card-title">Availability</h4>
+                    <p class="card-text">Status: <b id='aStatus'>${bookingStatus}</b></p>
+                    <p class="card-text">Availability: <b id='aAvail'>${bookingAvailability}</b></p>
+            </div>
+          </div>
+        </div>
+       </div>
+</div>
+<hr>
+<div class="jumbotron text-center">
+  <button class="btn btn-primary btn-lg" id="book30">Book now for 30 minutes</button>
+</div>
+<div class="card" align="center" id="bookingResult" style="display:none"></div>
+`;
+
+const bookRoom = document.getElementById('book30');
+bookRoom.addEventListener('click', book);
+
+  }
+
+main();
+
+})();
+
+</script>
+
+</body>
 </html>
