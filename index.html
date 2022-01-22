@@ -13,14 +13,6 @@
 
 Loading.. 
 <script type="text/javascript">
-(function () {
-  //Check if the getXAPI module is available
-  async function main() {
-    if (typeof getXAPI !== 'function') {
-      document.body.innerHTML = '<h1 id="notavailable">XAPI is not available!</h1>';
-      return;
-    }
-    
     //Define led colors based on booking availability
     const ledColors = {
            "Free":"green",
@@ -102,51 +94,11 @@ Loading..
     });
 
                     
-    document.body.innerHTML = `
-<div class="jumbotron text-center" id="led" style="background-color: ${currentLedColor}">
-  <h1>${deviceType}</h1>
-  ${serialNumber}
-</div>
 
-<div class="container">
-      <div class="row">
-        <div class="col-sm-3 mx-auto">
-          <div class="card" align="center">
-            <div class="card-body">
-                <h4 class="card-title">Environment</h4>
-                    <p class="card-text">People count: <b id='count'>${peopleCount}</b></p>
-                    <p class="card-text">Capacity: <b id='relativeHum'>${peopleCapacity}</b></p>
-                    <p class="card-text">People present: <b id='presence'>${presence}</b></p>
-                    <p class="card-text">Temperature: <b id='ambtemp'>${temp}</b></p>
-            </div>
-          </div>    
-        </div> 
-        <div class="col-sm-8 mx-auto">
-            <div class="card">
-            <div class="card-body">
-                <h4 class="card-title">Availability</h4>
-                    <p class="card-text">Status: <b id='aStatus'>${bookingStatus}</b></p>
-                    <p class="card-text">Availability: <b id='aAvail'>${bookingAvailability}</b></p>
-            </div>
-          </div>
-        </div>
-       </div>
-</div>
-<hr>
-<div class="jumbotron text-center">
-  <button class="btn btn-primary btn-lg" id="book30">Book now for 30 minutes</button>
-</div>
-<div class="card" align="center" id="bookingResult" style="display:none"></div>
-`;
 
 const bookRoom = document.getElementById('book30');
 bookRoom.addEventListener('click', book);
        
-  }
-
-main();
-
-})();
 
 </script>
 
