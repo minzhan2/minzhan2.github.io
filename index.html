@@ -33,7 +33,7 @@ Loading..
       bookingStatus,
       bookingAvailability,
       temp
-    ] = await Promise.all([ 
+    ] = [ 
       xapi.Status.SystemUnit.ProductId.get(),
       xapi.Status.SystemUnit.Hardware.Module.SerialNumber.get(),
       xapi.Status.RoomAnalytics.PeoplePresence.get(),
@@ -43,7 +43,7 @@ Loading..
       xapi.Status.Bookings.Availability.Status.get(),
       xapi.Status.Bookings.Availability.TimeStamp.get(),
       xapi.Status.Peripherals.ConnectedDevice.RoomAnalytics.AmbientTemperature.get()
-    ]); 
+    ]; 
   
     //Select current led color
     const currentLedColor = ledColors[bookingStatus]
