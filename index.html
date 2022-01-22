@@ -11,7 +11,7 @@
 </head>
 <body>
 
-Loading..
+Loading.. 
 <script type="text/javascript">
 (function () {
   //Check if the getXAPI module is available
@@ -20,28 +20,18 @@ Loading..
       document.body.innerHTML = '<h1 id="notavailable">XAPI is not available!</h1>';
       return;
     }
-
-<<<<<<< HEAD
+    
     //Define led colors based on booking availability
     const ledColors = {
            "Free":"green",
            "BookedUntil": "red",
            "FreeUntil": "yellow"
        }
-=======
-  jsxapi
-    .connect('ws://10.125.6.69', {
-      username: 'minzhan2',
-      password: 'xxx',
-    })
-    .on('error', console.error)
-    .on('ready', async (xapi) => {
->>>>>>> 92d472a11e3defb085745eb829539e905f7e4d89
-
+    
     //Define xapi
     const xapi = await getXAPI();
-
-    //Declare initial values on load
+    
+    //Declare initial values on load      
     const [
       deviceType,
       serialNumber,
@@ -52,7 +42,7 @@ Loading..
       bookingStatus,
       bookingAvailability,
       temp
-    ] = await Promise.all([
+    ] = await Promise.all([ 
       xapi.Status.SystemUnit.ProductId.get(),
       xapi.Status.SystemUnit.Hardware.Module.SerialNumber.get(),
       xapi.Status.RoomAnalytics.PeoplePresence.get(),
@@ -62,11 +52,11 @@ Loading..
       xapi.Status.Bookings.Availability.Status.get(),
       xapi.Status.Bookings.Availability.TimeStamp.get(),
       xapi.Status.Peripherals.ConnectedDevice.RoomAnalytics.AmbientTemperature.get()
-    ]);
-
+    ]); 
+  
     //Select current led color
     const currentLedColor = ledColors[bookingStatus]
-
+    
     //Function to select new LED colors based on the booking status
     async function led() {
         var bookedStatus = await xapi.Status.Bookings.Availability.Status.get();
@@ -75,34 +65,34 @@ Loading..
         document.getElementById('aStatus').innerHTML = bookedStatus;
         document.getElementById('aAvail').innerHTML = bookedAvailability;
     }
-
+    
     //Function to book the device for 30 minutes and print the result of the booking on the screen
     async function book() {
         result = await xapi.Command.Bookings.Book();
         rs = document.getElementById('bookingResult');
         rs.innerHTML = JSON.stringify(result);
-        rs.style['display'] = "block";
+        rs.style['display'] = "block"; 
         setTimeout(function(){rs.style['display'] = "none"}, 3000);
     }
-
+    
     async function refreshAnalyticsValues() {
         const [
           pres,
           peopleC,
           tempe
-        ] = await Promise.all([
+        ] = await Promise.all([ 
           xapi.Status.RoomAnalytics.PeoplePresence.get(),
           xapi.Status.RoomAnalytics.PeopleCount.Current.get(),
           xapi.Status.Peripherals.ConnectedDevice.RoomAnalytics.AmbientTemperature.get()
         ]);
-
+        
         document.getElementById('ambtemp').innerHTML = tempe;
         document.getElementById('count').innerHTML = peopleC;
         document.getElementById('presence').innerHTML = pres;
         led();
     }
-
-
+  
+    
     //Listen for status changes, updating the value for peoplecount when it changes on the codec
     xapi.Status.RoomAnalytics.on((event) => {
         refreshAnalyticsValues();
@@ -111,7 +101,7 @@ Loading..
         refreshAnalyticsValues();
     });
 
-
+                    
     document.body.innerHTML = `
 <div class="jumbotron text-center" id="led" style="background-color: ${currentLedColor}">
   <h1>${deviceType}</h1>
@@ -129,8 +119,8 @@ Loading..
                     <p class="card-text">People present: <b id='presence'>${presence}</b></p>
                     <p class="card-text">Temperature: <b id='ambtemp'>${temp}</b></p>
             </div>
-          </div>
-        </div>
+          </div>    
+        </div> 
         <div class="col-sm-8 mx-auto">
             <div class="card">
             <div class="card-body">
@@ -151,7 +141,7 @@ Loading..
 
 const bookRoom = document.getElementById('book30');
 bookRoom.addEventListener('click', book);
-
+       
   }
 
 main();
@@ -161,4 +151,4 @@ main();
 </script>
 
 </body>
-</html>
+</html> 
