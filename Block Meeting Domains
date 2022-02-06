@@ -1,0 +1,31 @@
+import xapi from 'xapi';
+
+// alert when the calls are bolcked
+function alert(seconds_Display,Text_Display, Title_Display) {
+  xapi.Command.UserInterface.Message.Alert.Display(
+    { Duration: seconds_Display, Text: Text_Display, Title: Title_Display });
+}
+
+// get remote party number
+function getRemoteNum() {
+ const value = xapi.Status.Call.RemoteNumber.get()
+ return value
+}
+
+// main function
+xapi.Status.SystemUnit.State.NumberOfInProgressCalls
+    .on( async (event) => {
+       const NumOfCalls = parseInt(event);
+        console.log(NumOfCalls)
+        if ( NumOfCalls> 0) { 
+          let RemoteNum = await getRemoteNum();
+          console.log('Remote Number = ' + RemoteNum)
+          console.log('checking number')
+          if (RemoteNum.match('webex.com') || RemoteNum.match('zoom.us')) {
+            console.log('success')
+             xapi.Command.Call.Disconnect();
+             console.log('disconnect')
+             alert(20,'通话禁止','您所拨打的电话被管理员禁止')
+          }   else {console.log('fail')}
+        }
+      })
