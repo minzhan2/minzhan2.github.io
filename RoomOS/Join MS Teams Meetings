@@ -1,0 +1,29 @@
+import xapi from 'xapi';
+
+xapi.Event.UserInterface.Extensions.Widget.Action
+    .on((event) => {
+    if (event.Type == 'clicked' && event.WidgetId == 'ms_teams'){
+            xapi.Command.UserInterface.Message.TextInput.Display(
+             { Duration: 300, 
+            FeedbackId: 'fb_meetingid', 
+            InputText: '', 
+            InputType: 'Numeric', 
+            KeyboardState: 'Open',  
+            SubmitText: '提交', 
+            Text: '请输入MS Teams会议号', 
+            })
+    }})
+
+    xapi.Event.UserInterface.Message.TextInput.Response
+    .on(event => {
+        console.log(event.FeedbackId)
+        if (event.FeedbackId ==  'fb_meetingid') {
+        const meeting_id = event.Text;
+        if (meeting_id) {
+          const meeting_uri = meeting_id + '.vdemo-collab@m.webex.com';
+          xapi.Command.Dial({Number: meeting_uri});
+          console.log('dial ' + meeting_uri)
+        }
+      }
+    });
+
