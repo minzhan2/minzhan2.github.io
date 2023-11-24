@@ -296,14 +296,14 @@
             });
 
             xapi.Status.RoomAnalytics.PeopleCount.Current.on((value) => {
-              peopleCountCurrent.innerHTML = (result == -1 ) ? '0' : result);
+              peopleCountCurrent.innerHTML = (result == -1 ) ? '0' : result;
             });
 
             xapi.Status.RoomAnalytics.PeopleCount.Capacity.on((value) => {
-              peopleCountCapacity.innerHTML = (result == -1 ) ? 'Not Set' : result);
+              peopleCountCapacity.innerHTML = (result == -1 ) ? 'Not Set' : result;
             });
-          });
-      }
+          };
+
 
       function inRoomNavigator(xapi) {
         return xapi.Status.Peripherals.ConnectedDevice.get()
