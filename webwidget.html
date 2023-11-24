@@ -273,7 +273,7 @@
               await await xapi.Status.RoomAnalytics.PeoplePresence.get();
             peopleCountCurrent.innerHTML =
               await await xapi.Status.RoomAnalytics.PeopleCount.Current.get()
-              .then(result => (result == -1 ) ? '0' : result))
+              .then(result => (result == -1 ) ? '0' : result)
             peopleCountCapacity.innerHTML =
               await xapi.Status.RoomAnalytics.PeopleCount.Capacity.get()
               .then(result => (result == -1 ) ? 'Not Set' : result)
