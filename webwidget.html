@@ -220,12 +220,19 @@
               temperature.innerHTML = convertTemp(
                 await xapi.Status.Peripherals.ConnectedDevice[
                   navID
-                ].RoomAnalytics.AmbientTemperature.get()
+                ].RoomAnalytics.AmbientTemperature.get((value) => {
+                  console.log(value);
+                })
               );
+              console.log(temperature.innerHTML);
+
               humidity.innerHTML =
                 await xapi.Status.Peripherals.ConnectedDevice[
                   navID
-                ].RoomAnalytics.RelativeHumidity.get();
+                ].RoomAnalytics.RelativeHumidity.get((value) => {
+                  console.log(value);
+                });
+              console.log(humidity.innerHTML);
 
               xapi.Status.RoomAnalytics.AmbientTemperature.on((value) => {
                 temperature.innerHTML = convertTemp(value);
@@ -261,51 +268,55 @@
                 console.log(`Humidity sensor not available on main device`);
                 humidity.innerHTML = "N/A";
               }
-
-              try {
-                xapi.Config.RoomAnalytics.PeopleCountOutOfCall.set("On");
-                xapi.Config.RoomAnalytics.PeoplePresenceDetector.set("On");
-              } catch {
-                console.warn("Could not enable PeopleCountOutOfCall");
-              }
-
-              peoplePresence.innerHTML =
-                await await xapi.Status.RoomAnalytics.PeoplePresence.get();
-              peopleCountCurrent.innerHTML =
-                await await xapi.Status.RoomAnalytics.PeopleCount.Current.get().then(
-                  (result) => (result == -1 ? "0" : result)
-                );
-              peopleCountCapacity.innerHTML =
-                await xapi.Status.RoomAnalytics.PeopleCount.Capacity.get().then(
-                  (result) => (result == -1 ? "Not Set" : result)
-                );
-
-              try {
-                closeProximiity.innerHTML =
-                  await xapi.Status.RoomAnalytics.Engagement.CloseProximity.get();
-
-                xapi.Status.RoomAnalytics.Engagement.CloseProximity.on(
-                  (value) => {
-                    closeProximiity.innerHTML = value;
-                  }
-                );
-              } catch {
-                closeProximiity.innerHTML = "N/A";
-              }
-
-              xapi.Status.RoomAnalytics.PeoplePresence.on((value) => {
-                peoplePresence.innerHTML = value;
-              });
-
-              xapi.Status.RoomAnalytics.PeopleCount.Current.on((value) => {
-                peopleCountCurrent.innerHTML = result == -1 ? "0" : result;
-              });
-
-              xapi.Status.RoomAnalytics.PeopleCount.Capacity.on((value) => {
-                peopleCountCapacity.innerHTML =
-                  result == -1 ? "Not Set" : result;
-              });
             }
+
+            try {
+              xapi.Config.RoomAnalytics.PeopleCountOutOfCall.set("On");
+              xapi.Config.RoomAnalytics.PeoplePresenceDetector.set("On");
+            } catch {
+              console.warn("Could not enable PeopleCountOutOfCall");
+            }
+
+            peoplePresence.innerHTML =
+              await await xapi.Status.RoomAnalytics.PeoplePresence.get();
+            console.log(peoplePresence.innerHTML);
+
+            peopleCountCurrent.innerHTML =
+              await await xapi.Status.RoomAnalytics.PeopleCount.Current.get().then(
+                (result) => (result == -1 ? "0" : result)
+              );
+            console.log(peopleCountCurrent.innerHTML);
+
+            peopleCountCapacity.innerHTML =
+              await await xapi.Status.RoomAnalytics.PeopleCount.Capacity.get().then(
+                (result) => (result == -1 ? "Not Set" : result)
+              );
+            console.log(peopleCountCapacity.innerHTML);
+
+            try {
+              closeProximiity.innerHTML =
+                await xapi.Status.RoomAnalytics.Engagement.CloseProximity.get();
+
+              xapi.Status.RoomAnalytics.Engagement.CloseProximity.on(
+                (value) => {
+                  closeProximiity.innerHTML = value;
+                }
+              );
+            } catch {
+              closeProximiity.innerHTML = "N/A";
+            }
+
+            xapi.Status.RoomAnalytics.PeoplePresence.on((value) => {
+              peoplePresence.innerHTML = value;
+            });
+
+            xapi.Status.RoomAnalytics.PeopleCount.Current.on((value) => {
+              peopleCountCurrent.innerHTML = result == -1 ? "0" : result;
+            });
+
+            xapi.Status.RoomAnalytics.PeopleCount.Capacity.on((value) => {
+              peopleCountCapacity.innerHTML = result == -1 ? "Not Set" : result;
+            });
           });
       }
 
